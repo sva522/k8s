@@ -1,0 +1,47 @@
+global:
+  hosts:
+    domain: gitlab.svc.lab.ln  # Le domaine unique demandé
+    https: true
+
+  ingress:
+    enabled: false 
+    # N'active pas la configuration de cert-manager par le chart GitLab
+    configureCertmanager: false 
+    # Référence au Secret TLS existant, même s'il est dans un autre namespace.
+    # Le chart peut copier ce secret si besoin, ou juste utiliser son nom pour la configuration interne.
+    tls:
+      secretName: tls-svc-lab-ln
+
+  # Le chart ne doit pas interagir avec cert-manager
+  certmanager:
+    install: false
+
+  traefik:
+    apiVersion: "traefik.io/v1alpha1"
+
+## Suppression de la configuration de l'émetteur cert-manager
+# certmanager-issuer:
+#   email: me@example.com # Suppression de cette section
+
+## Désactiver l'installation du chart NGINX-Ingress Controller (par défaut)
+nginx-ingress:
+  enabled: false
+
+## Désactiver l'installation du chart Traefik
+traefik:
+  install: false
+  ports:
+    gitlab-shell:
+      expose: true
+      port: 2222
+      exposedPort: 22
+
+# S'assurer qu'aucun autre composant n'essaie d'installer un Ingress en conflit
+postgresql:
+  metrics:
+    service:
+      annotations: {}
+redis:
+  metrics:
+    service:
+      annotations: {}

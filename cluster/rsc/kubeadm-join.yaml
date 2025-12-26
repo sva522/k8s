@@ -1,0 +1,19 @@
+apiVersion: kubeadm.k8s.io/v1beta4
+kind: JoinConfiguration
+discovery:
+  bootstrapToken:
+    token: "<join_token>"
+    apiServerEndpoint: "<control_plane_endpoint>:6443"
+    caCertHashes:
+      - "sha256:<dicovery_token>"
+nodeRegistration:
+  #name: "<fqdn>" # hostname by default
+  taints: []
+  kubeletExtraArgs:
+    - name: node-ip
+      value: <admin_ip>
+controlPlane:
+  localAPIEndpoint:
+    advertiseAddress: "<admin_ip>"
+    bindPort: 6443
+  certificateKey: "<certificate_key>"

@@ -1,0 +1,5 @@
+server = "https://registry.k8s.io"
+
+[host."https://container-registry.lab.ln:5001"]
+  capabilities = ["pull", "resolve"]
+  skip_verify = true

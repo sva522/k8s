@@ -1,0 +1,38 @@
+#!/usr/sbin/nft -f
+
+#flush ruleset
+
+table ip nat {
+    chain prerouting {
+        type nat hook prerouting priority -100;
+
+        # DNAT uniquement si la destination est 192.168.11.1
+        ip daddr 192.168.11.1 tcp dport 80 dnat to 192.168.11.100:80
+        ip daddr 192.168.11.1 tcp dport 443 dnat to 192.168.11.100:443
+    }
+
+    chain postrouting {
+        type nat hook postrouting priority 100;
+
+        # SNAT uniquement pour les connexions redirigées vers .100
+        ip saddr 192.168.11.0/24 ip daddr 192.168.11.100 tcp dport {80,443} \
+            snat to 192.168.11.1
+    }
+}
+
+# table ip filter {
+#     chain input {
+#         type filter hook input priority 0;
+#         accept
+#     }
+
+#     chain forward {
+#         type filter hook forward priority 0;
+#         accept
+#     }
+
+#     chain output {
+#         type filter hook output priority 0;
+#         accept
+#     }
+# }

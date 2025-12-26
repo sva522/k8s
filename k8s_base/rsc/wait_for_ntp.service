@@ -1,0 +1,11 @@
+[Unit]
+Description=Wait for NTP synchronization before starting Kubernetes
+After=chrony.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/wait_for_ntp --status
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target

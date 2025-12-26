@@ -1,0 +1,19 @@
+#cloud-config
+hostname: k8s1
+fqdn: k8s1.lab.ln
+manage_etc_hosts: true
+
+package_update: true
+package_upgrade: true
+
+# Create rescue account
+users:
+  - name: admin
+    gecos: Bootstrap rescue and automatization
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH0u42ThkDDkM6sPXoCGzgpJ23EiW2fUo0cysnnGWGKr packer@k8s
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /usr/bin/bash
+    #lock_passwd: false
+    ## openssl passwd -6 'rescue'
+    #passwd: $6$B8vK7R25sy.C9ltV$iS0TAhj0.Jl3uNlukNveOaNsh6ItYNemQcPySS0Knr4TE95JRa6RDglwldoKPKTU5OXFz7PFzg./DoOxexSKo0

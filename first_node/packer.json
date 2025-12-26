@@ -1,0 +1,81 @@
+{
+  "variables": {
+    "admin_net": "vm_admin",
+    "cni_net": "vm_cni",
+    "vsan_net": "vm_vsan",
+    "svc_net": "vm_svc",
+    "nc_ip": "",
+    "nc_port": ""
+  },
+  "builders": [
+    {
+      "type": "qemu",
+      "name": "k8s1",
+      "vm_name": "k8s1",
+      "iso_url": "empty.iso",
+      "iso_checksum": "sha256:55f3e6a2b3a3f536b01e4244eb3e02f918b0f22157c4697ed7c40f4ec985cd86",
+      "accelerator": "kvm",
+      "output_directory": "output",
+      "disk_interface": "virtio",
+      "headless": true,
+      "ssh_username": "admin",
+      "ssh_private_key_file": "~/.ssh/packer",
+      "ssh_timeout": "10m",
+      "shutdown_command": "sudo shutdown -P now",
+      "ssh_port": 2222,
+      "skip_nat_mapping": true,
+      "qemuargs": [
+        ["-smp", "6"],
+        ["-m", "4096"],
+
+        ["-cdrom", "seed.iso"],
+        ["-drive", "file=input/disk.qcow2,if=virtio,cache=writeback,format=qcow2"],
+
+        ["-netdev", "user,id=if_nat_net,hostfwd=tcp::2222-:22"],
+        ["-device", "virtio-net-pci,netdev=if_nat_net"],
+
+        ["-netdev", "tap,id=if_admin,ifname=vm_admin,script=no,downscript=no"],
+        ["-device", "virtio-net-pci,netdev=if_admin"],
+
+        ["-netdev", "tap,id=if_cni,ifname=vm_cni,script=no,downscript=no"],
+        ["-device", "virtio-net-pci,netdev=if_cni"],
+
+        ["-netdev", "tap,id=if_vsan,ifname=vm_vsan,script=no,downscript=no"],
+        ["-device", "virtio-net-pci,netdev=if_vsan"],
+
+        ["-netdev", "tap,id=if_svc,ifname=vm_svc,script=no,downscript=no"],
+        ["-device", "virtio-net-pci,netdev=if_svc"]
+      ]
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "file",
+      "source": "rsc",
+      "destination": "/home/admin/"
+    },
+    {
+      "type": "shell",
+      "script": "./scripts/setup.sh",
+      "execute_command": "sudo bash '{{.Path}}' {{user `admin_net`}} {{user `cni_net`}} {{user `vsan_net`}} {{user `svc_net`}} {{user `nc_ip`}} {{user `nc_port`}}",
+      "timeout":"120m"
+    },
+    {
+      "type": "file",
+      "source": "/tmp/gen/",
+      "destination": "output/",
+      "direction": "download"
+    },
+    {
+      "type": "shell",
+      "script": "./scripts/clean.sh",
+      "execute_command": "sudo bash '{{.Path}}'"
+    },
+    {
+      "type": "shell-local",
+      "inline": [
+        "kubectl get nodes -o wide --kubeconfig=output/gen/kube_config.conf"
+      ]
+    }
+  ]
+}

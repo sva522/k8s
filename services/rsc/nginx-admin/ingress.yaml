@@ -1,0 +1,33 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: nginx-admin-ingress
+  namespace: nginx-admin
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`admin.lab.ln`) || Host(`admin.svc`)
+      kind: Rule
+      services:
+        - name: nginx-admin-service
+          port: 80
+    - match: Host(`svc.lab.ln`) && PathPrefix(`/admin`)
+      kind: Rule
+      middlewares:
+        - name: strip-admin-prefix
+      services:
+        - name: nginx-admin-service
+          port: 80
+  tls:
+    secretName: tls-admin-lab-ln
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-admin-prefix
+  namespace: nginx-admin
+spec:
+  stripPrefix:
+    prefixes:
+      - /admin

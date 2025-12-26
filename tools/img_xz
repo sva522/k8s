@@ -1,0 +1,245 @@
+#!/usr/bin/bash
+
+set -euo pipefail
+
+usage() {
+    cmd=$(basename "$0")
+    cat << EOF
+Usage: ${cmd} [OPTIONS]
+
+Options:
+    Perform Maximum (re)compression :
+        - zero free disk space
+        - Perform maximal (-9) global xz compression
+    -mc, --max-compress <img_path>
+        Accepted input format -> Output format :
+        - img.qcow2                          -> img.qcow2.xz
+        - img.tar.<compressed> (.raw inside) -> img.tar.xz
+        - img.raw                            -> img.raw.xz
+        - img.raw.xz                         -> img.raw.xz
+
+    Convert compressed image format to workable block compressed image
+    -cq, --convert-qcow2 <img_path> <output_img_path>
+        Accepted input format ->  :
+        - img.tar.<compressed> (.raw inside)
+        - img.raw.xz
+        - img.raw
+        Expected Output format: .qcow2
+    
+    -h                                  Show this help message
+
+EOF
+    exit 1
+}
+
+readonly xz_level=9
+readonly qcow2_blocks_compress='--options compression_type=zstd,level=19'
+# TODO restore modified constant DEBUG
+#readonly xz_level=0
+#readonly qcow2_blocks_compress=
+
+main() {
+    if [[ $# -eq 0 ]]; then usage; fi
+    check_dependencies 'virt-sparsify' 'xz' 'tar' 'pv'
+    
+    local -r mode="$1"
+    
+    case "$mode" in
+        -h|--help) usage ;;
+        -mc|--max-compress)
+            if [[ $# -ne 2 ]]; then
+                echo 'Error: -mc, --max-compress requires <img_path>' >&2 && exit 2
+            fi
+            local -r input_path="$2"
+            max_compress "$input_path"
+        ;;
+        -cq|--convert-qcow2)
+            if [[ $# -ne 3 ]]; then
+                echo 'Error: -cq, --convert-qcow2  requires <img_path> and <output_img_path>' >&2 && exit 3
+            fi
+            local -r input_path="$2"
+            local -r output_path="$3"
+            convert_to_qcow2 "$input_path" "$output_path"
+        ;;
+
+        *)
+            echo "Error: Unknown option '$mode'" >&2 && usage
+        ;;
+    esac
+}
+
+max_compress() {
+    local -r img_path="$1"
+    
+    if [[ ! -f "$img_path" ]]; then
+        echo "Error: Input file '$img_path' does not exist" >&2
+        exit 4
+    fi
+    
+    if [[ "$img_path" =~ \.qcow2$ ]]; then
+        max_compress_qcow2 "$img_path"
+    elif [[ "$img_path" =~ \.tar\.[^.]+$ ]]; then
+        max_compress_tar_c "$img_path"
+    elif [[ "$img_path" =~ \.raw\.xz$ ]]; then
+        max_compress_raw_xz "$img_path"
+    elif [[ "$img_path" =~ \.raw$ ]]; then
+        max_compress_raw "$img_path"
+    else
+        echo 'Error: Input file must be .qcow2, .tar.<> (raw), .raw or .raw.xz' >&2
+        exit 7
+    fi
+}
+
+inplace_sparsify(){
+    local -r image_path="$1"
+    local -r options="${2:-}"
+    mv "$image_path" "${image_path}.nsp"
+    
+    local -r image_name=$(basename "$image_path")
+    echo "Sparsifing $image_name..."
+    virt-sparsify $options "${image_path}".nsp "$image_path"
+    rm "${image_path}.nsp"
+}
+
+max_compress_qcow2() {
+    local -r img_path="$1"
+    
+    echo "Max compressing $(file_hsize "$img_path")..."
+
+    inplace_sparsify "$img_path"
+    xz -T0 -${xz_level} -v "$img_path"
+
+    du -h "${img_path}.xz"
+}
+
+max_compress_tar_c() {
+    local img_tar_c_path="$1"
+    
+    echo "Max compressing $(file_hsize "$img_tar_c_path")..."
+    
+    local -r tmp_dir=$(mktemp -d /tmp/max_compress_tar_c.XXXXXX)
+    trap "rm -rf '$tmp_dir'" EXIT
+    tar -xf "$img_tar_c_path" -C "$tmp_dir" && rm "$img_tar_c_path"
+    img_tar_c_path="${img_tar_c_path%.*}.xz" # remove extension after .tar and add .xz
+
+    local -r raw_file_path="$(find "$tmp_dir" -name '*.raw' -type f | head -n 1)"
+    inplace_sparsify "$raw_file_path"
+
+    local -r content_size=$(du -sb "$tmp_dir" | cut -f1)
+    tar -C "$tmp_dir" -cf - . \
+        | pv -s "$content_size" \
+        | xz -${xz_level} > "$img_tar_c_path"
+    rm -rf "$tmp_dir"
+
+    du -h "$img_tar_c_path"
+}
+
+max_compress_raw_xz() {
+    local -r raw_xz_file_path="$1"
+
+    echo "Max compressing $(file_hsize "$raw_xz_file_path")..."
+    unxz -v "${raw_xz_file_path}"
+    local -r raw_file_path="${raw_xz_file_path%.xz}"
+
+    inplace_sparsify "$raw_file_path"
+    xz -v -${xz_level} "$raw_file_path"
+
+    du -h "$raw_xz_file_path"
+}
+
+max_compress_raw() {
+    local -r raw_file_path="$1"
+    echo "Max compressing $(file_hsize "$raw_file_path")..."
+
+    inplace_sparsify "$raw_file_path"
+
+    xz -v -${xz_level} "$raw_file_path"
+    du -h "${raw_file_path}.xz"
+}
+
+convert_to_qcow2() {
+    local -r input_img_path="$1"
+    local -r output_img_path="$2" && rm -f "$output_img_path"
+    
+    if [[ ! -f "$input_img_path" ]]; then
+        echo "Error: Input file '$input_img_path' does not exist" >&2
+        exit 8
+    fi
+
+    if [[ ! "$output_img_path" =~ \.qcow2$ ]]; then
+        echo "Error: Output file '$output_img_path' must be an .qcow2 file" >&2
+        exit 9
+    fi
+
+    if [[ "$input_img_path" =~ \.raw$ ]]; then
+        convert_from_raw "$input_img_path" "$output_img_path"
+
+    elif [[ "$input_img_path" =~ \.raw\.xz$ ]]; then
+        convert_from_raw_xz "$input_img_path" "$output_img_path"
+
+    elif [[ "$input_img_path" =~ \.tar\.[^.]+$ ]]; then
+        convert_from_tar_c "$input_img_path" "$output_img_path"
+
+    else
+        echo 'Error: Input file must be tar.<> (raw), raw or .raw.xz' >&2
+        exit 10
+    fi
+
+    du -h "$output_img_path"
+}
+
+convert_from_raw(){
+    local -r input_raw_path="$1"
+    local -r output_qcow2_path="$2"
+
+    virt-sparsify $qcow2_blocks_compress --convert qcow2 "$input_raw_path" "$output_qcow2_path"
+    rm "$input_raw_path"
+}
+
+convert_from_raw_xz(){
+    local -r input_raw_xz_path="$1"
+    local -r output_qcow2_path="$2"
+
+    unxz -v "$input_raw_xz_path"
+    local -r raw_file_path="${input_raw_xz_path%.xz}"
+    virt-sparsify $qcow2_blocks_compress --convert qcow2 "$raw_file_path" "$output_qcow2_path"
+    rm "$raw_file_path"
+}
+
+convert_from_tar_c(){
+    local -r input_tar_c_path="$1"
+    local -r output_qcow2_path="$2"
+    
+    local -r tmp_dir=$(mktemp -d /tmp/convert_from_tar_c.XXXXXX)
+    trap "rm -rf '$tmp_dir'" EXIT
+    tar -xf "$input_tar_c_path" -C "$tmp_dir"
+    local -r raw_file_path="$(find "$tmp_dir" -name '*.raw' -type f | head -n 1)"
+
+    virt-sparsify $qcow2_blocks_compress --convert qcow2 "$raw_file_path" "$output_qcow2_path"
+    rm -r "$input_tar_c_path" "$tmp_dir"
+}
+
+# Human readable file size
+file_hsize(){
+    local -r file_path="$1"
+    local -r filename=$(basename "${file_path}")
+    local -r hsize=$(du -h "$file_path" | cut -f1)
+    echo "$filename ($hsize)"
+}
+
+check_dependencies() {
+    local missing=()
+    
+    for cmd in "$@"; do
+        if ! command -v "$cmd" &> /dev/null; then
+            missing+=("$cmd")
+        fi
+    done
+    
+    if [[ ${#missing[@]} -gt 0 ]]; then
+        echo "Error: Missing required commands: ${missing[*]}" >&2
+        exit 12
+    fi
+}
+
+main "$@"

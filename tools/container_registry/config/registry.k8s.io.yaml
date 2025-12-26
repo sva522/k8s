@@ -1,0 +1,17 @@
+version: 0.1
+log:
+  level: info
+storage:
+  # Reduce RAM usage but slower performance
+  #cache:
+  #  blobdescriptor: inmemory
+  filesystem:
+    rootdirectory: /var/lib/registry
+http:
+  addr: :5000
+  tls:
+    certificate: /certs/container_registry.chain.crt
+    key: /certs/container_registry.key
+proxy:
+  remoteurl: https://registry.k8s.io
+

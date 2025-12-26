@@ -1,0 +1,14 @@
+#!/usr/bin/bash
+
+# bridgectl — Create bridge interface as a non priviliged user
+# Usage:
+#   ./bridgectl create <interface> <ip_address/mask> [-nat]
+#   ./bridgectl remove <interface>
+
+docker build -t bridgectl . &>/dev/null
+
+docker run --rm                                 \
+  --cap-add=NET_ADMIN                           \
+  --network host                                \
+  -v /proc/sys/net/ipv4:/host_proc_sys_net_ipv4 \
+  bridgectl "$@"

@@ -1,0 +1,5 @@
+server = "https://ghcr.io"
+
+[host."https://container-registry.lab.ln:5002"]
+  capabilities = ["pull", "resolve"]
+  skip_verify = true

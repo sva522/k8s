@@ -1,0 +1,12 @@
+#!/usr/bin/bash
+
+readonly last_version=$(curl -sL https://api.github.com/repos/kube-vip/kube-vip/releases | jq -r '.[0].name')
+readonly last_image="ghcr.io/kube-vip/kube-vip:${last_version}"
+if command -v crictl >/dev/null 2>&1; then
+    crictl pull "$last_image"
+    exec ctr -n k8s.io run --rm --net-host "$last_image" vip /kube-vip $@
+else
+    ctr image pull "$last_image"
+    exec ctr run --rm --net-host "$last_image" vip /kube-vip $@
+fi
+

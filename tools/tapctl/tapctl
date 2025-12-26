@@ -1,0 +1,15 @@
+#!/usr/bin/bash
+
+# tapctl — Create tap interface as a non priviliged user
+# Usage:
+#   ./tapctl create <interface> <ip_address/mask> [-nat]
+#   ./tapctl remove <interface>
+
+docker build -t tapctl . &>/dev/null
+
+docker run --rm                                 \
+  --cap-add=NET_ADMIN                           \
+  --network host                                \
+  --device /dev/net/tun:/dev/net/tun            \
+  -v /proc/sys/net/ipv4:/host_proc_sys_net_ipv4 \
+  tapctl "$@"

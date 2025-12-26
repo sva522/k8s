@@ -1,0 +1,21 @@
+#!/usr/bin/bash
+
+docker build -t libvirt_nat . &>/dev/null
+
+net_info(){
+    net_uuid="$1"
+    LANG=en_US.UTF-8 virsh -c qemu:///system net-info "$net_uuid" 2>/dev/null
+}
+
+libvirt_bridges=()
+for net_uuid in $(virsh -c qemu:///system net-list --uuid); do
+    bridge=$(net_info "$net_uuid" | grep -i '^bridge' | awk '{print $NF}')
+    [ -n "$bridge" ] && libvirt_bridges+=("$bridge")
+done
+
+docker run --rm                                 \
+  --cap-add=NET_ADMIN                           \
+  --network host                                \
+  --device /dev/net/tun:/dev/net/tun            \
+  -v /proc/sys/net/ipv4:/host_proc_sys_net_ipv4 \
+  libvirt_nat "${libvirt_bridges[@]}"

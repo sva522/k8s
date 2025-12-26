@@ -1,0 +1,39 @@
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: traefik-svc
+  namespace: metallb-system
+spec:
+  addresses:
+    - svc_vip/32
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: traefik-svc
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+    - traefik-svc
+  interfaces:
+    - svc_if
+---
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: traefik-admin
+  namespace: metallb-system
+spec:
+  addresses:
+    - admin_vip/32
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: traefik-admin
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+    - traefik-admin
+  interfaces:
+    - admin_if

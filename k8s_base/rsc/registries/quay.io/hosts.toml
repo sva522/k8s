@@ -1,0 +1,5 @@
+server = "https://quay.io"
+
+[host."https://container-registry.lab.ln:5004"]
+  capabilities = ["pull", "resolve"]
+  skip_verify = true

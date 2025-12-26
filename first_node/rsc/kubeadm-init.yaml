@@ -1,0 +1,42 @@
+# Configuration for whole cluster
+apiVersion: kubeadm.k8s.io/v1beta4
+kind: ClusterConfiguration
+controlPlaneEndpoint: k8s.lab.ln:6443
+apiServer:
+  certSANs:
+    - k8s.lab.ln
+    - k8s
+    - 192.168.11.1
+    - 127.0.0.1
+  extraArgs:
+    - name: "default-not-ready-toleration-seconds"   #
+      value: "8"                                     # Default: 300s = 5 min                                                      
+    - name: "default-unreachable-toleration-seconds" # 
+      value: "8"                                     # Default: 300s = 5 min
+controllerManager:
+  extraArgs:
+    - name: "node-monitor-period"       # Check all kubelet states every ...
+      value: "2s"                       # default = 5s
+    - name: "node-monitor-grace-period" # Node becomes NotReady
+      value: "6s"                      # default = 50s
+networking:
+  podSubnet: "10.10.0.0/16"
+---
+# Node configuration
+apiVersion: kubeadm.k8s.io/v1beta4
+kind: InitConfiguration
+localAPIEndpoint:
+  advertiseAddress: 192.168.11.11
+  bindPort: 6443
+nodeRegistration:
+# name: <NodeName> # hostname by default
+  taints: []
+  kubeletExtraArgs:
+    - name: node-ip
+      value: 192.168.11.11
+---
+apiVersion: kubelet.config.k8s.io/v1beta1
+kind: KubeletConfiguration
+serverTLSBootstrap: true
+rotateCertificates: true
+nodeStatusUpdateFrequency: 2s # default 10s, kubelet send its state de controlplane (to kubelet)

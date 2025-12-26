@@ -1,0 +1,24 @@
+# logging level ranges from -5 (Fatal) to 10 (Verbose). default level is 0
+loggingLevel: 0
+
+# providerRegex: must match both hostname and FQDN (else set --node-name=$(hostname -f) to kubeadm init).
+providerRegex: "^k8s\\d+(\\.lab\\.ln)?$"
+providerIpPrefixes:
+  - "192.168.11.0/24"
+#  - "127.0.0.0/8"
+#  - "fe80::/64"
+
+maxExpirationSeconds: 86400
+bypassDnsResolution: false
+
+#replicaCount: 1
+#leaderElection: false
+
+# podDnsPolicy and podDnsConfig: Specify external DNS.
+# This to avoid to resolve current hostname as 127.0.0.1 which does not match CSR IP (admin_ip)
+dnsPolicy: "None"
+dnsConfig:
+  nameservers:
+    - "192.168.11.254"
+  searches:
+    - "lab.ln"

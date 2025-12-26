@@ -1,0 +1,14 @@
+<network>
+  <name>vm_cni</name>
+  <!--<forward mode="nat"/>-->
+  <bridge name="vm_cni" stp="on" delay="0"/>
+  <ip address="192.168.12.254" netmask="255.255.255.0">
+    <!--
+    <dhcp>
+      <range start="192.168.150.100" end="192.168.150.200"/>
+      <host mac="52:54:00:aa:bb:01" name="k8s1" ip="192.168.150.101"/>
+      <host mac="52:54:00:aa:bb:02" name="k8s2" ip="192.168.150.102"/>
+    </dhcp>
+    -->
+  </ip>
+</network>

@@ -1,0 +1,27 @@
+# 4. RBAC CLUSTER ROLE (Définition de la permission) ⬅️ NOUVEAU
+# Permet l'approbation du certificat serveur Kubelet.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: system:controller:approve-kubelet-server-client-csr
+rules:
+- apiGroups: ["certificates.k8s.io"]
+  resources: ["certificatesigningrequests"]
+  verbs: ["approve"]
+  resourceNames: ["kubernetes.io/kubelet-serving"]
+---
+# ClusterRoleBinding corrigé ciblant l'approbateur standard
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kubelet-server-approver-binding
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: User
+  name: system:kube-controller-manager # L'utilisateur sous lequel le pod s'exécute
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  # Référence au ClusterRole qui donne l'autorisation d'approuver les CSR Kubelet-Serving
+  name: system:certificates.k8s.io:kubelet-serving
+  
