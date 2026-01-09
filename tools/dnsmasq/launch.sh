@@ -6,6 +6,7 @@ cd "$(dirname "$0")"
 ./build.sh &>/dev/null
 echo>dnsmasq.log
 echo>dhcp.log
+echo>stdout.log
 
 # Launced with "--network host" to bind tap interfaces
 docker run -d --rm \
@@ -13,7 +14,8 @@ docker run -d --rm \
   --network host \
   --cap-add=NET_ADMIN \
   --cap-add=NET_BIND_SERVICE \
-  -v $(pwd)/dnsmasq.conf:/etc/dnsmasq.conf:ro \
+  -v $(pwd)/rsc/dnsmasq.conf:/etc/dnsmasq.conf:ro \
+  -v $(pwd)/stdout.log:/var/log/dnsmasq_stdout.log \
   -v $(pwd)/dnsmasq.log:/var/log/dnsmasq.log \
   -v $(pwd)/dhcp.log:/var/log/dhcp.log \
   dnsmasq-infra

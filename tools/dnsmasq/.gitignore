@@ -1,2 +1,4 @@
 dnsmasq.log
 dhcp.log
+stdout.log
+

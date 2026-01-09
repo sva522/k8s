@@ -31,3 +31,6 @@ if [ -n "$lease_remaining" ]; then
     line="$line remaining_secs=$lease_remaining"
 fi
 echo "$line" >> /var/log/dhcp.log
+
+# Fix permission on dnsmasq. og
+# chmod g+w /var/log/dnsmasq.log
