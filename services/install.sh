@@ -9,6 +9,9 @@ readonly pki_dir="${services_dir}/../tools/pki/gen/"
 
 cd "$rsc_dir"
 
+metallb/install.sh
+exit 0
+
 kube-vip-lb/install.sh
 
 # Create TLS secrets
@@ -25,7 +28,7 @@ kubectl create secret tls tls-admin-lab-ln \
 # Install Traefik -----------------------------------------------------------------------------------------
 traefik/install.sh
 
-exit 0
+
 
 # Install Nginx -----------------------------------------------------------------------------------------
 #kubectl create namespace nginx

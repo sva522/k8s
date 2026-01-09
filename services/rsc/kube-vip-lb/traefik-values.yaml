@@ -44,7 +44,7 @@ service:
   enabled: true
   type: LoadBalancer
   annotations:
-    metallb.universe.tf/loadBalancerIPs: "svc_vip"
+    kube-vip.io/loadbalancerIPs: "svc_vip"
 
 tlsStore:
   default:
@@ -52,15 +52,16 @@ tlsStore:
       secretName: tls-svc-lab-ln
 
 extraObjects:
-  # Admin service
+  # Admin service (handled by admin kube-vip load balancer on ens4)
   - apiVersion: v1
     kind: Service
     metadata:
       name: traefik-admin-service
       annotations:
-         metallb.universe.tf/loadBalancerIPs: "admin_vip"
+        kube-vip.io/loadbalancerIPs: "admin_vip"
     spec:
       type: LoadBalancer
+      loadBalancerClass: "kube-vip-admin-lb"
       selector:
         app.kubernetes.io/name: traefik
         app.kubernetes.io/instance: traefik-traefik 

@@ -16,10 +16,21 @@ kubectl apply -f "https://raw.githubusercontent.com/metallb/metallb/$metallb_ver
 kubectl wait --namespace metallb-system --for=condition=Ready pods --all --timeout=120s
 
 # Setup metallb
-cp metallb/metallb.yaml /tmp/metallb.yaml
+cp metallb.yaml /tmp/metallb.yaml
 sed -i "s/admin_if/${admin_if}/"   /tmp/metallb.yaml
 sed -i "s/svc_if/${svc_if}/"       /tmp/metallb.yaml
 sed -i "s/svc_vip/${svc_vip}/"     /tmp/metallb.yaml
 sed -i "s/admin_vip/${admin_vip}/" /tmp/metallb.yaml
 kubectl apply -f /tmp/metallb.yaml
+echo 'Metallb configuration:'
+cat /tmp/metallb.yaml
 rm /tmp/metallb.yaml
+
+# Test
+kubectl apply -f ServicesTest.yaml
+kubectl wait --for=condition=ready pod -l app=vip-svc --timeout=60s
+kubectl wait --for=condition=ready pod -l app=vip-admin --timeout=60s
+k get svc
+curl -L http://admin.lab.ln | grep title
+curl -L http://svc.lab.ln | grep title
+kubectl delete -f ServicesTest.yaml
