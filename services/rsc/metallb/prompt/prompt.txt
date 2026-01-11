@@ -1,0 +1,30 @@
+Sur mon cluster kubernetes on premise (3 noeud  debian 13) que j'ai installé avec kubeadm j'ai un problème avec mettalb.
+k get services
+NAME            TYPE           CLUSTER-IP       EXTERNAL-IP      PORT(S)        AGE
+kubernetes      ClusterIP      10.96.0.1        <none>           443/TCP        18h
+svc-vip-admin   LoadBalancer   10.104.255.160   192.168.11.100   80:32397/TCP   5m52s
+svc-vip-svc     LoadBalancer   10.99.212.204    192.168.14.1     80:32330/TCP   5m53s
+
+L'objectif est de pouvoir avoir accès à svc-vip-admin  sur ens7 et svc-vip-admin  sur ens4.
+
+(Aujourd'hui je teste avec des nginx pour faire simple, mais le but est plus tard d'utiliser traefik, d'où les mentions mais laissons ça pour plus tard).
+
+Comme tu peux le voir calico est configuré pour fonctionner avec ens5.
+
+Voici mon problème: 
+
+ping -c1 192.168.11.100
+PING 192.168.11.100 (192.168.11.100) 56(84) octets de données.
+De 192.168.11.254 icmp_seq=1 Hôte de destination injoignable
+
+--- statistiques ping 192.168.11.100 ---
+1 paquets transmis, 0 reçus, +1 erreurs, 100% packet loss, time 0ms
+
+
+services/rsc/metallb on  main [!?] took 3s58ms 
+❌1 ❯ ping -c1 192.168.14.1  
+PING 192.168.14.1 (192.168.14.1) 56(84) octets de données.
+De 192.168.14.254 icmp_seq=1 Hôte de destination injoignable
+
+--- statistiques ping 192.168.14.1 ---
+1 paquets transmis, 0 reçus, +1 erreurs, 100% packet loss, time 0ms

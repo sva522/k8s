@@ -20,7 +20,7 @@ spec:
   entryPoints:
     - https-admin
   routes:
-    - match: Host(`traefik.admin.lab.ln`)
+    - match: Host(`traefik.k8s.lab.ln`)
       kind: Rule
       middlewares:
         - name: redirect-root-to-dashboard

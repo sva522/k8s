@@ -4,7 +4,7 @@ metadata:
   name: test-service
   annotations:
     kube-vip.io/loadbalancerIPs: "<SVC_VIP>"
-    kube-vip.io/vipHost: "<FQDN>"
+    kube-vip.io/vipHost: "k8s.lab.ln"
   labels:
     implementation: kube-vip
 spec:

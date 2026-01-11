@@ -3,7 +3,7 @@
 cd "$(dirname "$0")"
 
 readonly svc_vip=$(dig +short svc.lab.ln)
-readonly admin_vip=$(dig +short admin.lab.ln)
+readonly admin_vip=$(dig +short k8s.lab.ln)
 
 cp traefik-values.yaml /tmp/traefik-values.yaml
 sed -i "s/svc_vip/${svc_vip}/"     /tmp/traefik-values.yaml

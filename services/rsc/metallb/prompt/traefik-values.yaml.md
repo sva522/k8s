@@ -60,9 +60,7 @@ extraObjects:
       annotations:
          metallb.universe.tf/loadBalancerIPs: "admin_vip"
     spec:
-      type: ClusterIP
-      externalIPs:
-        - admin_vip
+      type: LoadBalancer
       selector:
         app.kubernetes.io/name: traefik
         app.kubernetes.io/instance: traefik-traefik 

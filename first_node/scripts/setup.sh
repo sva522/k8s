@@ -186,8 +186,9 @@ fi
 title KUBE VIP INSTALL ##############################################################################################################
 mkdir -p /etc/kubernetes/manifests/
 kubectl apply -f 'https://kube-vip.io/manifests/rbac.yaml'
-# To remove LB remove services, serviceInterface, servicesElection
-kube-vip manifest daemonset \
+
+kube-vip_with_lb(){
+    kube-vip manifest daemonset \
     --controlplane \
     --interface "${admin_if}" \
     --address "${cluster_vip}" \
@@ -199,6 +200,20 @@ kube-vip manifest daemonset \
     --services \
     --serviceInterface "${svc_if}" \
     --servicesElection > kube-vip.yaml
+}
+# To remove LB remove services, serviceInterface, servicesElection
+kube-vip_admin_only(){
+    kube-vip manifest daemonset \
+    --controlplane \
+    --interface "${admin_if}" \
+    --address "${cluster_vip}" \
+    --vipSubnet '24' \
+    --inCluster \
+    --taint \
+    --arp \
+    --leaderElection > kube-vip.yaml
+}
+kube-vip_with_lb
 "${rsc_dir}/configureKubeVip.py" kube-vip.yaml
 kubectl create -f kube-vip.yaml
 kubectl rollout status daemonset/kube-vip-ds -n kube-system --timeout=120s
@@ -211,7 +226,7 @@ kube-vip_svc_vip_test(){
     kubectl create deployment test-nginx --image=nginx
     kubectl rollout status deployment/test-nginx --timeout=30s
     cp "${rsc_dir}/ServiceTest.yaml" .
-    "${rsc_dir}/configureServiceTest.py" "${svc_vip}"
+    sed -i "s/<SVC_VIP>/${svc_vip}" ServiceTest.yaml
     kubectl apply -f ServiceTest.yaml
     kubectl get svc test-service -o wide
     echo 'Waiting test-service external ip to set...'
@@ -226,7 +241,7 @@ kube-vip_svc_vip_test(){
     kubectl delete svc test-service
     kubectl delete deployment test-nginx
 }
-kube-vip_svc_vip_test
+grep -q "$svc_if" kube-vip.yaml && kube-vip_svc_vip_test
 
 # Save kubeconfig
 cp /etc/kubernetes/admin.conf "${output_dir}/kube_config.conf"
