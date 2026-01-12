@@ -25,22 +25,7 @@ readonly node_qcow2_path="${input_dir}/${node_img_name%.xz}" # remove .xz
 readonly conf_dir="${first_node_path}/gen"
 readonly planning_file="$input_dir/planning.tfb"
 
-readonly dns_vm_admin='192.168.11.254'
-readonly dns_vm_cni='192.168.12.254'
-readonly dns_vm_vsan='192.168.13.254'
-readonly dn_vm_svc='192.168.14.254'
-
-setup_vm_net(){
-    echo "Checking clean state..."
-    ./stop.sh --keep_input_dir &>/dev/null # Stop best effort (removes old bridges)
-
-    bridgectl create vm_admin "$dns_vm_admin/24"
-    bridgectl create vm_cni   "$dns_vm_cni/24"
-    bridgectl create vm_vsan  "$dns_vm_vsan/24"
-    bridgectl create vm_svc   "$dn_vm_svc/24"
-    "${tools_dir}/dnsmasq/launch.sh"
-    "${tools_dir}/container_registry/launch.sh"
-}
+source scripts/net_conf.sh
 
 prepare_nodes(){
     unxz -c -v "$node_img_path" > "$node_qcow2_path"
@@ -57,7 +42,7 @@ prepare_first_node(){
     unxz -c -v "$first_node_img_path" > "$first_node_qcow2_path"
 }
 
-setup_vm_net       &
+scripts/start_infra.sh &
 prepare_first_node &
 if $full_cluster; then
     prepare_nodes  &
@@ -98,18 +83,6 @@ if $full_cluster; then
     wait_for_ping k8s2 "$k8s2_ip"
     wait_for_ping k8s3 "$k8s3_ip"
 fi
-
-wait_for_ssh(){
-    hostname="$1"
-    ip="$2"
-    echo -n "Wait for $hostname ssh started... "
-    until nc -z "$ip" 22 &>/dev/null; do sleep 5; done
-    echo "[OK]"
-    ssh-keygen  -R "$ip"       &>/dev/null
-    ssh-keygen  -R "$hostname" &>/dev/null
-    ssh-keyscan -H "$ip"       >> ~/.ssh/known_hosts
-    ssh-keyscan -H "$hostname" >> ~/.ssh/known_hosts
-}
 
 wait_for_ssh k8s1 "$k8s1_ip"
 if $full_cluster; then

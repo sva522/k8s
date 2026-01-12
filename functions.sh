@@ -141,3 +141,16 @@ netcat_script_stdout(){
 wait_netcat(){
     echo -n 'Waiting log deconnexion... ' && wait && echo 'Done.'
 }
+
+wait_for_ssh(){
+    hostname="$1"
+    ip="$2"
+    echo -n "Wait for $hostname ssh started... "
+    until nc -z "$ip" 22 &>/dev/null; do sleep 5; done
+    echo "[OK]"
+    ssh-keygen  -R "$ip"                &>/dev/null
+    ssh-keygen  -R "$hostname"          &>/dev/null
+    ssh-keygen  -R "${hostname}.lab.ln" &>/dev/null
+    ssh-keyscan -H "$ip"       >> ~/.ssh/known_hosts
+    ssh-keyscan -H "$hostname" >> ~/.ssh/known_hosts
+}
