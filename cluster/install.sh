@@ -50,7 +50,7 @@ fi
 wait
 
 # Print libvirt current state
-virsh -c qemu:///system list --all
+./status.sh
 if [ -n "$(find /etc/libvirt/qemu/ -name 'k8s*')" ]; then
     find /etc/libvirt/qemu/ -name 'k8s*' && exit 1
 fi
@@ -63,7 +63,7 @@ else
 fi
 tofu apply -auto-approve "$planning_file"
 libvirt_allow_nat
-virsh -c qemu:///system list --all
+./status.sh
 
 ## POST LAUNCH CHECKS ##############################################################################################
 

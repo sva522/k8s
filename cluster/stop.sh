@@ -15,8 +15,7 @@ scripts/stop_infra.sh &
 wait
 
 # Final status
-virsh -c qemu:///system net-list --all
-virsh -c qemu:///system list --all
+./status.sh
 
 # Check if VM autostart on launch
 # virsh -c qemu:///system dominfo k8s1 | grep Autostart
