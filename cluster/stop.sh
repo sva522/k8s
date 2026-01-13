@@ -10,7 +10,7 @@ virsh -c qemu:///system shutdown k8s3 &
 wait
 
 # Stop net
-virsh net-destroy vm_nat &
+virsh -c qemu:///system net-destroy vm_nat &
 scripts/stop_infra.sh &
 wait
 

@@ -21,12 +21,14 @@ ls /var/lib/libvirt/images/k8s*.iso   2>/dev/null
 rm -rf terraform*
 rm -rf .terraform*
 
-virsh -c qemu:///system destroy k8s1
-virsh -c qemu:///system destroy k8s2
-virsh -c qemu:///system destroy k8s3
-virsh -c qemu:///system undefine k8s1 --remove-all-storage
-virsh -c qemu:///system undefine k8s2 --remove-all-storage
-virsh -c qemu:///system undefine k8s3 --remove-all-storage
+virsh -c qemu:///system destroy k8s1 &
+virsh -c qemu:///system destroy k8s2 &
+virsh -c qemu:///system destroy k8s3 &
+wait
+virsh -c qemu:///system undefine k8s1 --remove-all-storage &
+virsh -c qemu:///system undefine k8s2 --remove-all-storage &
+virsh -c qemu:///system undefine k8s3 --remove-all-storage &
+wait
 #virsh -c qemu:///system net-destroy default
 #virsh -c qemu:///system net-undefine default
 virsh -c qemu:///system net-destroy vm_nat
@@ -36,5 +38,4 @@ if $clean_input_dir; then
     rm -rf "$input_dir"
 fi
 wait
-virsh -c qemu:///system net-list --all
-virsh -c qemu:///system list --all
+./status.sh
