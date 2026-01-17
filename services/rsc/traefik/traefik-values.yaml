@@ -46,6 +46,7 @@ service:
   annotations:
     kube-vip.io/loadbalancerIPs: "svc_vip"
 
+# Default TLS certificate
 tlsStore:
   default:
     defaultCertificate:

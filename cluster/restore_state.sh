@@ -3,6 +3,7 @@
 cd "$(dirname "$0")"
 
 source "../functions.sh"
+source "scripts/net_conf.sh"
 
 if [ ! -v 1 ]; then
     echo 'Missing snapthot name' && exit 1

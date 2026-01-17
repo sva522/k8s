@@ -129,3 +129,6 @@ openssl x509 -req -in admin.csr \
 # ============================================================
 cat admin.crt ../intermediate_ca.crt ../root_ca.crt > admin.chain.crt
 cd "$pki_dir"
+
+# Install Root CA to system
+cp root_cat.crt /usr/local/share/ca-certificates/ && sudo update-ca-certificates

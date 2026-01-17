@@ -98,7 +98,7 @@ apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: svc-admin-ingress
-  namespace: default
+  namespace: traefik
 spec:
   entryPoints:
     - https-admin
@@ -108,4 +108,5 @@ spec:
       services:
         - name: svc-admin-svc
           port: 80
-  tls: {}
+  tls:
+     secretName: tls-admin-lab-ln
