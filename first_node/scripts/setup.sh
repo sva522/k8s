@@ -226,7 +226,7 @@ kube-vip_svc_vip_test(){
     kubectl create deployment test-nginx --image=nginx
     kubectl rollout status deployment/test-nginx --timeout=30s
     cp "${rsc_dir}/ServiceTest.yaml" .
-    sed -i "s/<SVC_VIP>/${svc_vip}" ServiceTest.yaml
+    sed -i "s/<svc_vip>/${svc_vip}/" ServiceTest.yaml
     kubectl apply -f ServiceTest.yaml
     kubectl get svc test-service -o wide
     echo 'Waiting test-service external ip to set...'

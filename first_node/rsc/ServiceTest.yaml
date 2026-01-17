@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: test-service
   annotations:
-    kube-vip.io/loadbalancerIPs: "<SVC_VIP>"
+    kube-vip.io/loadbalancerIPs: "<svc_vip>"
     kube-vip.io/vipHost: "k8s.lab.ln"
   labels:
     implementation: kube-vip
