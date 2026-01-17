@@ -9,10 +9,6 @@ readonly pki_dir="${services_dir}/../tools/pki/gen/"
 
 cd "$rsc_dir"
 
-traefik/install.sh
-exit 0
-
-
 check_connectivity(){
   local url="$1"
   local caption="$2"
@@ -23,8 +19,23 @@ check_connectivity(){
   fi
 }
 
+traefik/install.sh
+default-app.sh
+check_connectivity svc.lab.ln 'Nginx Default'
+app1/install.sh
+check_connectivity app1.svc.lab.ln  'Nginx App1'
+check_connectivity svc.lab.ln/app1/ 'Nginx App1'
+app2/install.sh
+check_connectivity app2.svc.lab.ln  'Nginx App2'
+check_connectivity svc.lab.ln/app2/ 'Nginx App2'
+read -rp 'Press [ENTER] to continue' </dev/tty
+admin/install.sh
+check_connectivity admin.lab.ln 'Nginx Admin'
+check_connectivity traefik.svc.lab.ln 'Traefik Dashboard'
+exit 0
+
 echo 'Checking connectivity...'
-check_connectivity svc.lab.ln       'Welcome to nginx'
+
 check_connectivity app2.svc.lab.ln  'Nginx App2'
 check_connectivity svc.lab.ln/app2  'Nginx App2'
 check_connectivity admin.lab.ln 'Nginx Admin'
@@ -61,11 +72,6 @@ helm repo add gitlab https://charts.gitlab.io/; helm repo update &>/dev/null
 #   -f gitlab-values.yaml \
 #   --namespace gitlab \
 #   --create-namespace
-
-# virsh -c qemu:///system suspend k8s1
-# virsh -c qemu:///system resume k8s1
-# virsh -c qemu:///system shutdown k8s1
-# virsh -c qemu:///system destroy k8s1 # hard stop
 
 #kubectl port-forward svc/longhorn-frontend -n longhorn-system 8080:80 # http://localhost:8080
 #kubectl port-forward -n calico-system service/whisker 8080:8081

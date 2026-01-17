@@ -100,6 +100,7 @@ echo > /etc/motd # Remove motd
 
 cat sysctl-k8s.conf       > /etc/sysctl.d/k8s.conf
 cat grub.cfg > /etc/default/grub.d/custom.cfg && update-grub
+systemctl enable --now serial-getty@ttyS0.service # enable serial console
 cat k8s-modprobe.conf     > /etc/modules-load.d/k8s.conf
 
 # Set generic hostname

@@ -9,9 +9,7 @@ if [ ! -v 1 ]; then
     echo 'Missing snapthot name' && exit 1
 fi
 
-virsh -c qemu:///system destroy k8s1 2>/dev/null
-virsh -c qemu:///system destroy k8s2 2>/dev/null
-virsh -c qemu:///system destroy k8s3 2>/dev/null
+./force_stop.sh 2>/dev/null
 
 restore_snapshot(){
     vm_name="$1"
@@ -33,3 +31,4 @@ wait_for_ssh k8s3 "$k8s3_ip"
 ssh admin@k8s1 wait_for_ntp
 ssh admin@k8s2 wait_for_ntp
 ssh admin@k8s3 wait_for_ntp
+kubectl get nodes -o wide

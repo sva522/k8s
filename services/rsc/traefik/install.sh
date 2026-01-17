@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 cd "$(dirname "$0")"
-readonly pki_dir="${PWD}/../../tools/pki/gen/"
+readonly pki_dir="${PWD}/../../../tools/pki/gen/"
 
 kubectl create namespace traefik
 kubectl create secret tls tls-svc-lab-ln \

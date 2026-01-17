@@ -22,3 +22,4 @@ wait_for_ssh k8s3 "$k8s3_ip"
 ssh admin@k8s1 wait_for_ntp
 ssh admin@k8s2 wait_for_ntp
 ssh admin@k8s3 wait_for_ntp
+kubectl get nodes -o wide
