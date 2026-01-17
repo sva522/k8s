@@ -1,8 +1,8 @@
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
-  name: nginx-app2-ingress
-  namespace: nginx-app2
+  name: app2-ingress
+  namespace: app2
 spec:
   entryPoints:
     - websecure
@@ -10,22 +10,22 @@ spec:
     - match: Host(`app2.svc.lab.ln`) || Host(`app2.svc`)
       kind: Rule
       services:
-        - name: nginx-app2-service
+        - name: app2-service
           port: 80
     - match: Host(`svc.lab.ln`) && PathPrefix(`/app2`)
       kind: Rule
       middlewares:
-        - name: strip-app2-prefix
+        - name: app2-strip-prefix
       services:
-        - name: nginx-app2-service
+        - name: app2-service
           port: 80
   tls: {}
 ---
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
-  name: strip-app2-prefix
-  namespace: nginx-app2
+  name: app2-strip-prefix
+  namespace: app2
 spec:
   stripPrefix:
     prefixes:

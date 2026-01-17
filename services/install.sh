@@ -9,35 +9,9 @@ readonly pki_dir="${services_dir}/../tools/pki/gen/"
 
 cd "$rsc_dir"
 
-# Create TLS secrets
-kubectl create namespace traefik
-kubectl create secret tls tls-svc-lab-ln \
-  --namespace=traefik \
-  --cert="$pki_dir/services/services.chain.crt" \
-  --key="$pki_dir/services/services.key"
-kubectl create secret tls tls-admin-lab-ln \
-  --namespace=traefik \
-  --cert="$pki_dir/admin/admin.chain.crt" \
-  --key="$pki_dir/admin/admin.key"
-
-# Install Traefik -----------------------------------------------------------------------------------------
 traefik/install.sh
 exit 0
 
-# Install Nginx -----------------------------------------------------------------------------------------
-#kubectl create namespace nginx
-kubectl create --save-config -f app1/nginx.yaml
-kubectl create --save-config -f app1/ingress.yaml
-kubectl wait --for=condition=ready pod -l app=nginx-app1 -n nginx-app1 --timeout=300s
-kubectl create --save-config -f app2/nginx.yaml
-kubectl create --save-config -f app2/ingress.yaml
-kubectl wait --for=condition=ready pod -l app=nginx-app2 -n nginx-app2 --timeout=300s
-kubectl create --save-config -f nginx-admin/nginx.yaml
-kubectl create --save-config -f nginx-admin/ingress.yaml
-kubectl wait --for=condition=ready pod -l app=nginx-admin -n nginx-admin --timeout=300s
-kubectl create --save-config -f traefik/dashboard-ingress.yaml
-kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=traefik -n traefik --timeout=300s
-kubectl get svc -A
 
 check_connectivity(){
   local url="$1"

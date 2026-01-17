@@ -1,40 +1,40 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app2-deployment
-  namespace: app2
+  name: admin-deployment
+  namespace: admin
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: app2
+      app: admin
   template:
     metadata:
       labels:
-        app: app2
+        app: admin
     spec:
       containers:
-      - name: app2
+      - name: admin
         image: nginx:latest
         ports:
         - containerPort: 80
         volumeMounts:
-        - name: app2-volume
+        - name: admin-volume
           mountPath: /usr/share/nginx/html
       volumes:
-      - name: app2-volume
+      - name: admin-volume
         configMap:
-          name: app2-page
+          name: admin-page
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: app2-service
-  namespace: app2
+  name: admin-service
+  namespace: admin
 spec:
   type: ClusterIP
   selector:
-    app: app2
+    app: admin
   ports:
   - port: 80
     targetPort: 80

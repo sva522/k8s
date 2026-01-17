@@ -1,0 +1,15 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: default-app-ingress
+  namespace: default-app
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`svc.lab.ln`) || Host(`svc`)
+      kind: Rule
+      services:
+        - name: default-app-service
+          port: 80
+  tls: {}

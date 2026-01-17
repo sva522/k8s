@@ -1,0 +1,15 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: admin-ingress
+  namespace: admin
+spec:
+  entryPoints:
+    - https-admin
+  routes:
+    - match: Host(`k8s.lab.ln`)
+      kind: Rule
+      services:
+        - name: admin-service
+          port: 80
+  tls: {}
