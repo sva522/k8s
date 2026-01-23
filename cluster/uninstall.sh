@@ -21,7 +21,15 @@ ls /var/lib/libvirt/images/k8s*.iso   2>/dev/null
 rm -rf terraform*
 rm -rf .terraform*
 
-force_stop.sh
+./force_stop.sh
+virsh -c qemu:///system snapshot-delete k8s1 --metadata --current &
+virsh -c qemu:///system snapshot-delete k8s2 --metadata --current &
+virsh -c qemu:///system snapshot-delete k8s3 --metadata --current &
+wait
+virsh -c qemu:///system managedsave-remove k8s1 &
+virsh -c qemu:///system managedsave-remove k8s2 &  
+virsh -c qemu:///system managedsave-remove k8s3 &
+wait
 virsh -c qemu:///system undefine k8s1 --remove-all-storage &
 virsh -c qemu:///system undefine k8s2 --remove-all-storage &
 virsh -c qemu:///system undefine k8s3 --remove-all-storage &

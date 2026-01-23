@@ -9,10 +9,11 @@ stop_containers(){
 }
 
 reset_network(){
-    bridgectl remove vm_admin
-    bridgectl remove vm_cni
-    bridgectl remove vm_vsan
-    bridgectl remove vm_svc
+    bridgectl remove vm_admin &
+    bridgectl remove vm_cni   &
+    bridgectl remove vm_vsan  &
+    bridgectl remove vm_svc   &
+    wait
 }
 
 stop_containers &
