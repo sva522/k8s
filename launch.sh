@@ -81,5 +81,5 @@ cd "$project_dir"
 # Launch builds ##################################################
 k8s_base/launch.sh
 first_node/launch.sh
-cluster/launch.sh
+cluster/install.sh
 #services/launch.sh
