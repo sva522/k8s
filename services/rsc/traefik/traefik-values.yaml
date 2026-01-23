@@ -10,6 +10,16 @@ ports:
   
   websecure: {}
 
+  # Add empty admin entry point
+  http-admin:
+    port: 9000
+    expose:
+      default: false
+  https-admin:
+    port: 9443
+    expose:
+      default: false
+
 # Main service
 service:
   enabled: true
