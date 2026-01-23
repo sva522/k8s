@@ -17,9 +17,9 @@ service:
   annotations:
     kube-vip.io/loadbalancerIPs: "192.168.14.1"
 
-# ingressRoute:
-#   dashboard:
-#     enabled: false
+ingressRoute:
+  dashboard:
+    enabled: false
 
 # Default TLS certificate
 tlsStore:
