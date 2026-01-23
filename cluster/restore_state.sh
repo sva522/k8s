@@ -5,8 +5,11 @@ cd "$(dirname "$0")"
 source "../functions.sh"
 source "scripts/net_conf.sh"
 
+snapshot_name="$1"
 if [ ! -v 1 ]; then
-    echo 'Missing snapthot name' && exit 1
+    # Use last snapshot
+    snapshot_name=$(virsh -c qemu:///system snapshot-list k8s1 --name | sort -r | head -1)
+    #echo 'Missing snapthot name' && exit 1
 fi
 
 ./force_stop.sh 2>/dev/null
@@ -16,9 +19,11 @@ restore_snapshot(){
     snapshot_name="$2"
     virsh -c qemu:///system restore "/var/lib/libvirt/qemu/save/${vm_name}_${snapshot_name}.mem"
 }
-restore_snapshot k8s1 "$1" &
-restore_snapshot k8s2 "$1" &
-restore_snapshot k8s3 "$1" & 
+
+echo "Restoring ${snapshot_name}..."
+restore_snapshot k8s1 "$snapshot_name" &
+restore_snapshot k8s2 "$snapshot_name" &
+restore_snapshot k8s3 "$snapshot_name" & 
 wait
 
 readonly k8s1_ip=$(dig k8s1 +short "@$dns_vm_admin")

@@ -10,8 +10,8 @@ kubectl create secret tls tls-admin-lab-ln \
   --key="$pki_dir/admin/admin.key"
 kubectl create configmap -n admin admin-page --from-file=index.html=./index.html
 
-kubectl apply -f traefik-admin.yaml
-kubectl apply -f dashboard-ingress.yaml
+kubectl apply -f traefik-svc-admin.yaml
+kubectl apply -f traefik-dashboard-ingress.yaml
 
 kubectl apply -f nginx.yaml
-kubectl apply -f ingress.yaml
+kubectl apply -f admin-ingress.yaml

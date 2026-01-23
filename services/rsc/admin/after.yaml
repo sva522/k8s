@@ -1,0 +1,64 @@
+# values.yaml de secours
+
+# Configuration des ports (on garde vos ports admin)
+ports:
+  web:
+    port: 8000
+    exposedPort: 80
+  websecure:
+    port: 8443
+    exposedPort: 443
+  http-admin:
+    port: 9000
+    expose:
+      default: false
+  https-admin:
+    port: 9443
+    expose:
+      default: false
+
+# CHANGEMENT CRITIQUE : Passez en ClusterIP pour ne pas déclencher kube-vip/metallb
+service:
+  enabled: true
+  type: ClusterIP # <--- On ne demande plus d'IP externe à Helm
+  annotations: {} # On vide les annotations problématiques
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik-main-lb
+  namespace: traefik
+  annotations:
+    kube-vip.io/loadbalancerIPs: "192.168.11.200" # IP LIBRE ET FIXE
+spec:
+  type: LoadBalancer
+  selector:
+    app.kubernetes.io/name: traefik
+    app.kubernetes.io/instance: traefik-traefik
+  ports:
+    - name: web
+      port: 80
+      targetPort: 8000
+    - name: websecure
+      port: 443
+      targetPort: 8443
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik-admin-lb
+  namespace: traefik
+  annotations:
+    kube-vip.io/loadbalancerIPs: "192.168.11.201" # AUTRE IP LIBRE
+spec:
+  type: LoadBalancer
+  selector:
+    app.kubernetes.io/name: traefik
+    app.kubernetes.io/instance: traefik-traefik
+  ports:
+    - name: http-admin
+      port: 80
+      targetPort: 9000
+    - name: https-admin
+      port: 443
+      targetPort: 9443

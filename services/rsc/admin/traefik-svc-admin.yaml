@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: traefik-admin-service
-  namespace: traefik
+  namespace: admin
   annotations:
       metallb.universe.tf/loadBalancerIPs: "admin_vip"
 spec:
@@ -19,13 +19,3 @@ spec:
     - name: https-admin
       port: 443         # External port (Host)
       targetPort: 9443  # Internal port (Container)
----
-apiVersion: traefik.io/v1alpha1
-kind: TLSOption
-metadata:
-  name: admin-tls-options
-  namespace: traefik
-spec:
-  defaultCertificate:
-    secretName: tls-admin-lab-ln
-  minVersion: VersionTLS12

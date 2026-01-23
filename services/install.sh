@@ -15,13 +15,14 @@ check_connectivity(){
   if curl -sk "https://$url" | grep -qi "$caption"; then
     echo "$url [OK]"
   else
-    echo "$url [NOK]"
+    echo "$url [NOK]" && exit 55
   fi
 }
 
 traefik/install.sh
-default-app.sh
+default-app/install.sh
 check_connectivity svc.lab.ln 'Nginx Default'
+exit 0
 app1/install.sh
 check_connectivity app1.svc.lab.ln  'Nginx App1'
 check_connectivity svc.lab.ln/app1/ 'Nginx App1'

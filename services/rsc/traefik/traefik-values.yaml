@@ -2,42 +2,41 @@
 ports:
   # Service entrypoints
   web:
-    port: 8000
-    expose:
-      default: true       # Create entry in main service
-    exposedPort: 80       # Exposed port on VIP
-    redirections:
-      entryPoint:
-        to: websecure
-        scheme: https
-        permanent: true
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
   
-  websecure:
-    port: 8443
-    expose:
-      default: true       # Create entry in main service
-    exposedPort: 443      # Exposed port on VIP
-    tls:
-      enabled: true
+  websecure: {}
 
-  # Admin entrypoints
-  http-admin:
-    port: 9000
-    expose:
-      default: false      # Do not use main service
-    redirections:
-      entryPoint:
-        to: https-admin
-        scheme: https
-        permanent: true
+#   # Admin entrypoints
+#   http-admin:
+#     port: 9000
+#     expose:
+#       default: false      # Do not use main service
+# #    exposedPort: 80
+#     http:
+#       redirections:
+#         entryPoint:
+#           to: https-admin
+#           scheme: https
+#           permanent: true
   
-  https-admin:
-    port: 9443
-    expose:
-      default: false      # Do not use main service
-    tls:
-      enabled: true
-      options: "traefik/admin-tls-options@kubernetescrd"
+#   https-admin:
+#     port: 9443
+#     expose:
+#       default: false      # Do not use main service
+#     exposedPort: 443
+
+  # http-admin:
+  #   port: 9000
+  #   expose:
+  #     default: false
+  # https-admin:
+  #   port: 9443
+  #   expose:
+  #     default: false
 
 # Main service
 service:
@@ -45,6 +44,10 @@ service:
   type: LoadBalancer
   annotations:
     kube-vip.io/loadbalancerIPs: "svc_vip"
+
+ingressRoute:
+  dashboard:
+    enabled: false
 
 # Default TLS certificate
 tlsStore:
