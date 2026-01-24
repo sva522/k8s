@@ -121,9 +121,8 @@ if $full_cluster; then
         cat scripts/kubeadm_join.sh | ssh "admin@$node_ip" "sudo bash -s -- $kubeadm_join_args"
     }
 
-    kubeadm_join 'k8s2' "$k8s2_ip" &
-    kubeadm_join 'k8s3' "$k8s3_ip" &
-    wait
+    kubeadm_join 'k8s2' "$k8s2_ip"
+    kubeadm_join 'k8s3' "$k8s3_ip"
 fi
 
 echo 'On host: --------------------------------'

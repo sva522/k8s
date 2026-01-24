@@ -67,7 +67,7 @@ openssl x509 -req -in container_registry.csr \
 # ============================================================
 # 8. Build certificate chain (for server use, client will use root_ca.crt)
 # ============================================================
-cat container_registry.crt ../intermediate_ca.crt ../root_ca.crt  > container_registry.chain.crt
+cat container_registry.crt ../intermediate_ca.crt > container_registry.chain.crt
 # On server: container_registry.key + container_registry.chain.crt
 # On client: cp root_ca.crt /usr/local/share/ca-certificates/ && update-ca-certificates
 cd "$pki_dir"
@@ -97,7 +97,7 @@ openssl x509 -req -in services.csr \
 # ============================================================
 # 8. Build certificate chain (for server use, client will use root_ca.crt)
 # ============================================================
-cat services.crt ../intermediate_ca.crt ../root_ca.crt > services.chain.crt
+cat services.crt ../intermediate_ca.crt > services.chain.crt
 # On server: services.key + services.chain.crt
 # On client: cp root_ca.crt /usr/local/share/ca-certificates/ && update-ca-certificates
 cd "$pki_dir"
@@ -127,8 +127,10 @@ openssl x509 -req -in admin.csr \
 # ============================================================
 # 8. Build certificate chain (for server use, client will use root_ca.crt)
 # ============================================================
-cat admin.crt ../intermediate_ca.crt ../root_ca.crt > admin.chain.crt
+cat admin.crt ../intermediate_ca.crt > admin.chain.crt
 cd "$pki_dir"
 
 # Install Root CA to system
-cp root_cat.crt /usr/local/share/ca-certificates/ && sudo update-ca-certificates
+#cp root_cat.crt /usr/local/share/ca-certificates/ && sudo update-ca-certificates
+sudo cp root_ca.crt /etc/ca-certificates/trust-source/anchors/
+sudo update-ca-trust

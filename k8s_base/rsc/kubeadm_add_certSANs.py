@@ -7,6 +7,7 @@ from sys import argv, exit
 from os import remove
 import requests
 from shutil import which
+from time import sleep
 
 blue = '\033[34;1m'
 grey = '\033[90;1m'
@@ -29,6 +30,8 @@ def print_current_sans():
             'openssl x509 -in /etc/kubernetes/pki/apiserver.crt -noout -text | '
             "grep -A1 'Subject Alternative Name'"
         )
+        if not isinstance(out, str):
+            raise Exception('No output from openssl command')
         # Get second lines only
         out = out.split('\n')[1]
         out = out.replace('DNS:', '').replace('IP Address:', '').strip()
@@ -37,8 +40,16 @@ def print_current_sans():
         print(f'{red}Unable to read /etc/kubernetes/pki/apiserver.crt (check permissions?){nocolor}')
 
 def fetch_cluster_config() -> dict:
-    '''Fetch the current ClusterConfiguration from the kubeadm ConfigMap.'''
-    raw = run("kubectl -n kube-system get cm kubeadm-config -o jsonpath='{.data.ClusterConfiguration}'")
+    raw = None
+    attempts = 6
+    while not raw and attempts > 0:
+        attempts -= 1
+        try:
+            raw = run("kubectl -n kube-system get cm kubeadm-config -o jsonpath='{.data.ClusterConfiguration}'")
+        except Exception as e:
+            sleep(2)
+    if not raw:
+        raise Exception('Failed to fetch ClusterConfiguration from kubeadm ConfigMap')
     return yaml.safe_load(raw)
 
 def modify_config(cluster_conf: dict):

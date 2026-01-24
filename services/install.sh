@@ -9,37 +9,44 @@ readonly pki_dir="${services_dir}/../tools/pki/gen/"
 
 cd "$rsc_dir"
 
-check_connectivity(){
+check_connectivity() {
   local url="$1"
   local caption="$2"
-  if curl -sk "https://$url" | grep -qi "$caption"; then
-    echo "$url [OK]"
-  else
-    echo "$url [NOK]" && exit 55
-  fi
+  local timeout=6
+  local start=$(date +%s)
+
+  while true; do
+    if curl -skL "https://$url" 2>/dev/null | grep -qi "$caption"; then
+      echo "$url [OK]"
+      return 0
+    fi
+
+    # Check timeout
+    if (( $(date +%s) - start >= timeout )); then
+      echo "$url [NOK]"
+      exit 55
+    fi
+
+    sleep 2
+  done
 }
 
 traefik/install.sh
 default-app/install.sh
-check_connectivity svc.lab.ln 'Nginx Default'
-exit 0
 app1/install.sh
-check_connectivity app1.svc.lab.ln  'Nginx App1'
-check_connectivity svc.lab.ln/app1/ 'Nginx App1'
 app2/install.sh
-check_connectivity app2.svc.lab.ln  'Nginx App2'
-check_connectivity svc.lab.ln/app2/ 'Nginx App2'
-read -rp 'Press [ENTER] to continue' </dev/tty
 admin/install.sh
-check_connectivity admin.lab.ln 'Nginx Admin'
-check_connectivity traefik.svc.lab.ln 'Traefik Dashboard'
+
+# kubectl rollout restart deployment -n traefik traefik
+check_connectivity svc.lab.ln         'Nginx Default'
+check_connectivity app1.svc.lab.ln    'Nginx App1'
+check_connectivity svc.lab.ln/app1/   'Nginx App1'
+check_connectivity app2.svc.lab.ln    'Nginx App2'
+check_connectivity svc.lab.ln/app2/   'Nginx App2'
+check_connectivity k8s.lab.ln         'Nginx Admin'
+check_connectivity traefik.k8s.lab.ln 'Traefik Proxy'
+
 exit 0
-
-echo 'Checking connectivity...'
-
-check_connectivity app2.svc.lab.ln  'Nginx App2'
-check_connectivity svc.lab.ln/app2  'Nginx App2'
-check_connectivity admin.lab.ln 'Nginx Admin'
 
 readonly dns_on_vsan=$(dig dns.vm_vsan.lab.ln +short)
 network_get_prefix(){

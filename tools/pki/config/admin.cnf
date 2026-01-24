@@ -6,13 +6,19 @@ distinguished_name = dn
 req_extensions     = req_ext
 
 [ dn ]
-CN = admin.lab.ln
+CN = k8s.lab.ln
 
 [ req_ext ]
 subjectAltName = @alt_names
 basicConstraints = CA:FALSE
 
 [ alt_names ]
-DNS.1 = admin.lab.ln
-DNS.2 = admin
+DNS.1 = k8s.lab.ln
+DNS.2 = *.k8s.lab.ln 
+DNS.3 = k8s
+DNS.4 = *.k8s
+DNS.5 = admin.lab.ln
+DNS.6 = *.admin.lab.ln
+DNS.7 = admin
+DNS.8 = *.admin
 IP.1  = 127.0.0.1

@@ -151,6 +151,8 @@ wait_for_ssh(){
     ssh-keygen  -R "$ip"                &>/dev/null
     ssh-keygen  -R "$hostname"          &>/dev/null
     ssh-keygen  -R "${hostname}.lab.ln" &>/dev/null
-    ssh-keyscan -H "$ip"       >> ~/.ssh/known_hosts
-    ssh-keyscan -H "$hostname" >> ~/.ssh/known_hosts
+    # shellcheck disable=SC2129
+    ssh-keyscan -H "$ip"                >> ~/.ssh/known_hosts
+    ssh-keyscan -H "$hostname"          >> ~/.ssh/known_hosts
+    ssh-keyscan -H "${hostname}.lab.ln" >> ~/.ssh/known_hosts
 }

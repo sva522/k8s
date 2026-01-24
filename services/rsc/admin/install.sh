@@ -5,13 +5,20 @@ readonly pki_dir="${PWD}/../../../tools/pki/gen/"
 
 kubectl create namespace admin
 kubectl create secret tls tls-admin-lab-ln \
-  --namespace=traefik \
+  --namespace=admin \
   --cert="$pki_dir/admin/admin.chain.crt" \
   --key="$pki_dir/admin/admin.key"
 kubectl create configmap -n admin admin-page --from-file=index.html=./index.html
 
-kubectl apply -f traefik-svc-admin.yaml
-kubectl apply -f traefik-dashboard-ingress.yaml
+#kubectl apply -f tls-store.yaml
+kubectl apply -f admin-app.yaml
+kubectl apply -f ingress-admin-app.yaml
+kubectl apply -f service-admin.yaml
+#kubectl apply -f ingress-traefik-dashboard.yaml
+kubectl wait --for=condition=Ready pods --all -n admin --timeout=120s
+kubectl wait --for=condition=Ready pods --all -n traefik --timeout=120s
 
-kubectl apply -f nginx.yaml
-kubectl apply -f admin-ingress.yaml
+
+# kubectl get secret -n admin tls-admin-lab-ln -o jsonpath="{.data['tls\.crt']}" | base64 -d | openssl x509 -noout -text | grep -E "Subject:|DNS:"
+
+

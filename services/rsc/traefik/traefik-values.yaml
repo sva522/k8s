@@ -25,7 +25,7 @@ service:
   enabled: true
   type: LoadBalancer
   annotations:
-    kube-vip.io/loadbalancerIPs: "192.168.14.1"
+    kube-vip.io/loadbalancerIPs: "svc_vip"
 
 ingressRoute:
   dashboard:
