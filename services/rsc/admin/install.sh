@@ -13,7 +13,7 @@ kubectl create configmap -n admin admin-page --from-file=index.html=./index.html
 admin_ip=$(dig k8s.lab.ln +short)
 [ -z "$admin_ip" ] && exit 88
 
-kubectl apply - f tls-store.yaml
+kubectl apply -f tls-store.yaml
 kubectl apply -f admin-app.yaml
 kubectl apply -f ingress-admin-app.yaml
 sed "s/<admin_ip>/$admin_ip/" service-admin.yaml | kubectl apply -f -

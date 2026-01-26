@@ -24,7 +24,7 @@ check_connectivity() {
   done
 }
 
-longhorn/install.sh
+#longhorn/install.sh
 
 traefik/install.sh
 default-app/install.sh
