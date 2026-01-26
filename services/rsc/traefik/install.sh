@@ -12,8 +12,8 @@ kubectl create secret tls tls-svc-lab-ln \
 readonly svc_vip=$(dig +short svc.lab.ln)
 [ -z "$svc_vip" ]   && exit 1
 
-cp -f traefik-values.yaml /tmp/traefik-values.yaml
-sed -i "s/svc_vip/${svc_vip}/"     /tmp/traefik-values.yaml
+cp -f traefik-values.yaml      /tmp/traefik-values.yaml
+sed -i "s/svc_vip/${svc_vip}/" /tmp/traefik-values.yaml
 
 # helm repo add traefik https://traefik.github.io/charts; helm repo update &>/dev/null
 helm uninstall traefik --namespace=traefik --wait &>/dev/null
@@ -23,5 +23,8 @@ echo 'Installing traefik...'
 helm install traefik traefik/traefik -n traefik -f /tmp/traefik-values.yaml
 kubectl wait --for=condition=available deployment/traefik -n traefik --timeout=300s
 kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=traefik -n traefik --timeout=300s
-# rm /tmp/traefik-values.yaml
+rm /tmp/traefik-values.yaml
 echo 'Traefik installation finished !'
+
+# kubectl port-forward -n traefik svc/traefik 8080:9000
+# kubectl port-forward -n calico-system service/whisker 8080:8081

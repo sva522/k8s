@@ -1,7 +1,7 @@
 apiVersion: traefik.io/v1alpha1
 kind: TLSStore
 metadata:
-  name: admin-store
+  name: admin-tls-store
   namespace: admin
 spec:
   defaultCertificate:

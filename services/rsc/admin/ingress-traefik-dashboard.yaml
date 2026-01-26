@@ -27,4 +27,5 @@ spec:
         - name: api@internal
           kind: TraefikService
   tls:
-    secretName: tls-admin-lab-ln
+    store:
+      name: admin-tls-store

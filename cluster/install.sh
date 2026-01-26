@@ -2,6 +2,10 @@
 set -euo pipefail
 
 cd "$(dirname "$0")"
+echo -n 'Cleaning... '
+./uninstall.sh &>/dev/null
+echo 'Done.'
+
 source "../functions.sh"
 
 # default: full cluster with 3 nodes

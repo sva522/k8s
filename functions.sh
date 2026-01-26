@@ -1,9 +1,42 @@
+#!/usr/bin/bash
+
 # THIS FILE IS INTENDED TO BE SOURCED
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then exit 1; fi
 
 # Get project dir
 readonly sourced_functions_file_path=$(realpath "$BASH_SOURCE")
 project_dir=$(dirname "$sourced_functions_file_path")
+
+# Get last version (without leading v)
+github_get_latest_version() {
+  local owner="$1"
+  local repo="${2:-$1}"
+  local i=0
+  local version=""
+  local releases
+
+  releases=$(curl -sL "https://api.github.com/repos/${owner}/${repo}/releases")
+
+  while true; do
+    # Get last "name" | Get last word, if version is prefixed with a release name
+    version=$(echo "$releases" | jq -r ".[$i].name" | awk '{print $NF}')
+
+    # Si vide, on a atteint la fin
+    if [[ -z "$version" || "$version" == "null" ]]; then
+      echo "No version found for ${owner}/${repo}"
+      return 1
+    fi
+
+    # Check if format matchs vX.X.X ou X.X.X
+    if [[ "$version" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+      if [[ "${version:0:1}" == "v" ]]; then version="${version:1}"; fi
+      echo "$version"
+      return 0
+    fi
+
+    ((i++))
+  done
+}
 
 # Import tools
 tools_dir="${project_dir}/tools"

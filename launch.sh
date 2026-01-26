@@ -3,38 +3,10 @@
 cd "$(dirname "$0")"
 readonly project_dir="$PWD"
 
+source 'functions.sh'
+
 # Setup bin dir ##################################################
 cd "${project_dir}/tools"
-
-# Get last version (without leading v)
-github_get_latest_version() {
-  local owner="$1"
-  local repo="${2:-$1}"
-  local i=0
-  local version=""
-  local releases
-
-  releases=$(curl -sL "https://api.github.com/repos/${owner}/${repo}/releases")
-
-  while true; do
-    version=$(echo "$releases" | jq -r ".[$i].name")
-
-    # Si vide, on a atteint la fin
-    if [[ -z "$version" || "$version" == "null" ]]; then
-      echo "No version found for ${owner}/${repo}"
-      return 1
-    fi
-
-    # Check if format matchs vX.X.X ou X.X.X
-    if [[ "$version" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-      if [[ "${version:0:1}" == "v" ]]; then version="${version:1}"; fi
-      echo "$version"
-      return 0
-    fi
-
-    ((i++))
-  done
-}
 
 #### Fetch packer ###########################################################################################
 packer_last_version=$(github_get_latest_version hashicorp packer)

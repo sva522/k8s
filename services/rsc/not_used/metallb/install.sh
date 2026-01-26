@@ -31,6 +31,6 @@ kubectl apply -f ServicesTest.yaml
 kubectl wait --for=condition=ready pod -l app=vip-svc --timeout=60s
 kubectl wait --for=condition=ready pod -l app=vip-admin --timeout=60s
 kubectl get services
-curl -L http://admin.lab.ln | grep title
+curl -L http://k8s.lab.ln | grep title
 curl -L http://svc.lab.ln | grep title
 kubectl delete -f ServicesTest.yaml

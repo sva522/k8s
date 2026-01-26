@@ -6,7 +6,7 @@ metadata:
 spec:
   type: ClusterIP
   externalIPs:
-    - 192.168.11.1
+    - <admin_ip>
   selector:
     app.kubernetes.io/name: traefik
     app.kubernetes.io/instance: traefik-traefik 
