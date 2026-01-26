@@ -13,6 +13,4 @@ spec:
         - name: admin-service
           port: 80
   tls:
-    store:
-      name: admin-tls-store
-  # secretName: tls-admin-lab-ln
+    secretName: tls-admin-lab-ln

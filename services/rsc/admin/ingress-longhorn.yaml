@@ -12,6 +12,4 @@ spec:
       services:
         - name: longhorn-frontend
           port: 80
-  tls:
-    store:
-      name: admin-tls-store
+  tls: {}

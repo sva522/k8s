@@ -12,6 +12,24 @@ spec:
       services:
         - name: whisker
           port: 8081
-  tls:
-    store:
-      name: admin-tls-store
+  tls: {}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-traefik-access
+  namespace: calico-system
+spec:
+  podSelector:
+    matchLabels:
+      k8s-app: whisker 
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: traefik
+      ports:
+        - protocol: TCP
+          port: 8081
