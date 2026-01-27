@@ -4,7 +4,7 @@ from flask import Flask, render_template_string, request, redirect, jsonify
 import sqlite3
 
 app = Flask(__name__)
-DB_PATH = '/app/data.db'
+DB_PATH = '/app/data/data.db'
 
 def init_db():
     conn = sqlite3.connect(DB_PATH)

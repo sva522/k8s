@@ -24,7 +24,7 @@ check_connectivity() {
   done
 }
 
-#longhorn/install.sh
+longhorn/install.sh
 
 traefik/install.sh
 default-app/install.sh
@@ -43,4 +43,4 @@ echo 'Checking admin endpoint...'
 check_connectivity k8s.lab.ln         'Nginx Admin'
 check_connectivity traefik.k8s.lab.ln 'Traefik Proxy'
 
-#simple_app/install.sh
+simple_app/install.sh

@@ -16,6 +16,7 @@ spec:
       containers:
       - name: simple-app
         image: container-registry.lab.ln:5000/simple-app:1.0
+        imagePullPolicy: Always 
         ports:
         - containerPort: 8080
         livenessProbe:
@@ -37,7 +38,7 @@ spec:
         # Uncomment to enable persistent storage for /app/data.db
         volumeMounts:
          - name: simple-app-data
-           mountPath: /app
+           mountPath: /app/data
       # Uncomment to enable persistent storage for /app/data.db
       volumes:
       - name: simple-app-data
