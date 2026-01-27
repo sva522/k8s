@@ -10,8 +10,7 @@ fi
 rm_snapshot(){
     vm_name="$1"
     snapshot_name="$2"
-    virsh snapshot-delete "$vm_name" "$snapshot_name" --metadata
-    rm /var/lib/libvirt/qemu/save/"$vm_name"_"$snapshot_name".mem
+    virsh snapshot-delete  --domain "$vm_name" --snapshotname "$snapshot_name"
 }
 
 rm_snapshot k8s1 "$1"
