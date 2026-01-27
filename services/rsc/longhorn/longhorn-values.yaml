@@ -1,2 +1,4 @@
 defaultSettings:
-  defaultReplicaNetwork: ens6
+  nodeDownPodDeletionPolicy: delete-deployment-pod
+  #nodeDownPodDeletionPolicy: delete-both-statefulset-and-deployment-pod
+  storageNetwork: ens6

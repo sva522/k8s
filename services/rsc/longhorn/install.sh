@@ -9,10 +9,12 @@ network_get_prefix(){
 }
 readonly vsan_net_prefix=$(network_get_prefix "$dns_on_vsan")
 
+wait_for_ssh k8s1 "$(dig k8s1 +short)"
 node_net_conf(){
     ssh admin@k8s1 'ip -brief a'
 }
-vsan_if=$(node_net_conf | grep "$vsan_net_prefix.*/" | awk '{print $1}')
+vsan_if=$(node_net_conf | grep "$vsan_net_prefix.*/" | awk '{print $1}')*
+[ -z "$vsan_if" ] && exit 77
 sed "s|^  defaultReplicaNetwork: .*|  defaultReplicaNetwork: $vsan_if|" longhorn-values.yaml > /tmp/longhorn-values.yaml
 
 # Install local path provisionner
