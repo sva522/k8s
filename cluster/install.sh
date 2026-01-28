@@ -131,6 +131,6 @@ fi
 
 echo 'On host: --------------------------------'
 kubectl get nodes -o wide
-
+./sav_state.sh 'cluster_just_installed'
 # Alternative SANs:
 # kubectl config set-cluster kubernetes --server=https://192.168.11.11:6443

@@ -17,7 +17,7 @@ fi
 restore_snapshot(){
     vm_name="$1"
     snapshot_name="$2"
-    virsh -c qemu:///system restore snapshot-revert --domain "$vm_name" --snapshotname "$snapshot_name"
+    virsh -c qemu:///system snapshot-revert "$vm_name" "$snapshot_name"
 }
 
 echo "Restoring ${snapshot_name}..."

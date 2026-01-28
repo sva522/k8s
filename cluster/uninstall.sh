@@ -14,9 +14,6 @@ scripts/stop_infra.sh &
 ls /etc/libvirt/qemu/k8s*.xml         2>/dev/null
 ls /var/lib/libvirt/images/k8s*.qcow2 2>/dev/null
 ls /var/lib/libvirt/images/k8s*.iso   2>/dev/null
-#sudo rm -f /etc/libvirt/qemu/k8s*.xml
-#sudo rm -f /var/lib/libvirt/images/k8s*.qcow2
-#sudo rm -f /var/lib/libvirt/images/k8s*.iso
 
 rm -rf terraform*
 rm -rf .terraform*
@@ -38,6 +35,12 @@ wait
 #virsh -c qemu:///system net-undefine default
 virsh -c qemu:///system net-destroy vm_nat
 virsh -c qemu:///system net-undefine vm_nat
+
+#sudo rm -f /etc/libvirt/qemu/k8s*.xml
+#sudo rm -f /var/lib/libvirt/images/k8s*.qcow2
+#sudo rm -f /var/lib/libvirt/images/k8s*.iso
+#sudo rm -f /var/lib/libvirt/qemu/save/*.mem
+#sudo rm /var/lib/libvirt/images/*.qcow2
 
 if $clean_input_dir; then
     rm -rf "$input_dir"
