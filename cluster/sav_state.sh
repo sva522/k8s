@@ -8,7 +8,7 @@ fi
 create_snapshot(){
     vm_name="$1"
     snapshot_name="$2"
-    virsh -c qemu:///system snapshot-create-as --domain "$vm_name" --name "$snapshot_name" --live # --description 'Before update'
+    virsh -c qemu:///system snapshot-create-as --domain "$vm_name" --name "$snapshot_name" # --description 'Before update'
 }
 
 create_snapshot k8s1 "$name" --live &
