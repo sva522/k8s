@@ -94,7 +94,6 @@ update-initramfs -u
 sed -i '/^#if ! shopt -oq posix/,/^#fi/ s/^#//' /etc/bash.bashrc
 cat bashrc_append.sh  >> /etc/bash.bashrc
 mkdir /root/.kube
-mkdir /home/admin/.kube && chown admin:admin /home/admin/.kube
 cat nanorc            >  /etc/nanorc
 echo > /etc/motd # Remove motd
 
