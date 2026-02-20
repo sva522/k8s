@@ -1,6 +1,7 @@
 # Configuration for whole cluster
 apiVersion: kubeadm.k8s.io/v1beta4
 kind: ClusterConfiguration
+clusterName: SvcCluster
 controlPlaneEndpoint: k8s.lab.ln:6443
 apiServer:
   certSANs:
